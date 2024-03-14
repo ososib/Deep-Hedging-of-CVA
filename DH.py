@@ -51,10 +51,15 @@ from stable_baselines3.common.vec_env import DummyVecEnv, VecEnv, sync_envs_norm
 if TYPE_CHECKING:
     from stable_baselines3.common import base_class
 
-import market_sim
-import hedge_env
-import callbacks
-import esvar
+from market_sim import *
+from hedge_env import *
+from callbacks import *
+from esvar import *
+
+import pandas as pd
+
+df = pd.DataFrame({},
+                  index=['Variance Total Cost', 'Variance Total Cost Without First', 'Mean Square Total Cost', 'Mean Total Cost','Value at Risk', 'Value at Risk Without First', 'Expected Shortfall', 'Expected Shortfall Without First', 'Mean Turnover'])
 
 """## Define Environment
 
@@ -360,16 +365,8 @@ for i in range(10):
   totalsells = sellA + sellB
   Mean_Turnover.append(100*np.min([np.abs(np.sum(totalbuys)), np.abs(np.sum(totalsells))])/np.abs(np.mean(netasset)))
 
-#when script, replace prints with append to dataframe with appropriate columns
-print(f'{np.mean(Var_Total_Cost):.2}')
-print(f'{np.mean(Var_Total_Cost_Without_First):.2}')
-print(f'{np.mean(Mean_Square_Total_Cost):.2}')
-print(f'{np.mean(Mean_Total_Cost):.2}')
-print(f'{np.mean(Value_at_Risk):.2}')
-print(f'{np.mean(Value_at_Risk_Without_First):.2}')
-print(f'{np.mean(Mean_Turnover):.2}')
-print(f'{np.mean(Expected_Shortfall):.2}')
-print(f'{np.mean(Expected_Shortfall_Without_First):.2}')
+df['Reward' + str(treward)]=[f'{np.mean(Var_Total_Cost):.2}', f'{np.mean(Var_Total_Cost_Without_First):.2}', f'{np.mean(Mean_Square_Total_Cost):.2}', f'{np.mean(Mean_Total_Cost):.2}', f'{np.mean(Value_at_Risk):.2}', f'{np.mean(Value_at_Risk_Without_First):.2}', f'{np.mean(Expected_Shortfall):.2}', f'{np.mean(Expected_Shortfall_Without_First):.2}', f'{np.mean(Mean_Turnover):.2}']
+
 
 
 #when script, put outside parameter loop
@@ -425,16 +422,7 @@ for i in range(10):
   Mean_Turnover.append(100*np.min([np.abs(np.sum(totalbuys)), np.abs(np.sum(totalsells))])/np.abs(np.mean(netasset)))
 
 
-#when script, replace prints with append to dataframe with appropriate columns
-print(f'{np.mean(Var_Total_Cost):.2}')
-print(f'{np.mean(Var_Total_Cost_Without_First):.2}')
-print(f'{np.mean(Mean_Square_Total_Cost):.2}')
-print(f'{np.mean(Mean_Total_Cost):.2}')
-print(f'{np.mean(Value_at_Risk):.2}')
-print(f'{np.mean(Value_at_Risk_Without_First):.2}')
-print(f'{np.mean(Mean_Turnover):.2}')
-print(f'{np.mean(Expected_Shortfall):.2}')
-print(f'{np.mean(Expected_Shortfall_Without_First):.2}')
+df['Delta']=[f'{np.mean(Var_Total_Cost):.2}', f'{np.mean(Var_Total_Cost_Without_First):.2}', f'{np.mean(Mean_Square_Total_Cost):.2}', f'{np.mean(Mean_Total_Cost):.2}', f'{np.mean(Value_at_Risk):.2}', f'{np.mean(Value_at_Risk_Without_First):.2}', f'{np.mean(Expected_Shortfall):.2}', f'{np.mean(Expected_Shortfall_Without_First):.2}', f'{np.mean(Mean_Turnover):.2}']
 
 
 ## Do Nothing:
@@ -488,13 +476,6 @@ for i in range(10):
   totalsells = sellA + sellB
   Mean_Turnover.append(100*np.min([np.abs(np.sum(totalbuys)), np.abs(np.sum(totalsells))])/np.abs(np.mean(netasset)))
 
-#when script, replace prints with append to dataframe with appropriate columns
-print(f'{np.mean(Var_Total_Cost):.2}')
-print(f'{np.mean(Var_Total_Cost_Without_First):.2}')
-print(f'{np.mean(Mean_Square_Total_Cost):.2}')
-print(f'{np.mean(Mean_Total_Cost):.2}')
-print(f'{np.mean(Value_at_Risk):.2}')
-print(f'{np.mean(Value_at_Risk_Without_First):.2}')
-print(f'{np.mean(Mean_Turnover):.2}')
-print(f'{np.mean(Expected_Shortfall):.2}')
-print(f'{np.mean(Expected_Shortfall_Without_First):.2}')
+df['Nothing']=[f'{np.mean(Var_Total_Cost):.2}', f'{np.mean(Var_Total_Cost_Without_First):.2}', f'{np.mean(Mean_Square_Total_Cost):.2}', f'{np.mean(Mean_Total_Cost):.2}', f'{np.mean(Value_at_Risk):.2}', f'{np.mean(Value_at_Risk_Without_First):.2}', f'{np.mean(Expected_Shortfall):.2}', f'{np.mean(Expected_Shortfall_Without_First):.2}', f'{np.mean(Mean_Turnover):.2}']
+
+(df.T).to_csv('PerformanceTable.csv')
