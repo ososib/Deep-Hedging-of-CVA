@@ -143,7 +143,7 @@ for rho in [-1, -0.75,-0.5,0.25,0,0.25,0.5,0.75,1]:
         
         #model.save("rho05tc05")
         model = PPO.load("/home/osmanoscar/DH_mars/"+str(rho)+'/'+ str(treward)+"/1/best_model.zip")
-        model.save("rho05tc05b")
+        #model.save("rho05tc05b")
         #model = PPO.load("rho05tc05") histdata = np.append(histdata[1:],newdata)
         
         
@@ -210,7 +210,7 @@ for rho in [-1, -0.75,-0.5,0.25,0,0.25,0.5,0.75,1]:
         """
         
         '''
-        model = PPO.load("rho05tc05b")
+        #model = PPO.load("rho05tc05b")
         
         rew=[0]
         
