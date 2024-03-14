@@ -105,13 +105,13 @@ for rho in [-1, -0.75,-0.5,0.25,0,0.25,0.5,0.75,1]:
         
         
         # Create log dir
-        log_dir_0 = "/home/osmanoscar/DH_mars/"+str(rho) +str(treward) + "/0/" # change wehn script to depend on reward function, rho, and tc
+        log_dir_0 = "/home/osmanoscar/DH_mars/"+str(rho)+'/'+str(treward) + "/0/" # change wehn script to depend on reward function, rho, and tc
         os.makedirs(log_dir_0, exist_ok=True) #change exists?
         
-        log_dir_1 = "/home/osmanoscar/DH_mars/"+str(rho)+str(treward) + "/1/" # change wehn script to depend on reward function, rho, and tc
+        log_dir_1 = "/home/osmanoscar/DH_mars/"+str(rho)+'/'+str(treward) + "/1/" # change wehn script to depend on reward function, rho, and tc
         os.makedirs(log_dir_1, exist_ok=True) #change exists?
         
-        log_dir_2 = "/home/osmanoscar/DH_mars/"+str(rho)+str(treward) + "/2/" # change wehn script to depend on reward function, rho, and tc
+        log_dir_2 = "/home/osmanoscar/DH_mars/"+str(rho)+'/'+str(treward) + "/2/" # change wehn script to depend on reward function, rho, and tc
         os.makedirs(log_dir_2, exist_ok=True) #change exists?
         
         # Wrap the environment
@@ -142,7 +142,7 @@ for rho in [-1, -0.75,-0.5,0.25,0,0.25,0.5,0.75,1]:
         #del model # remove to demonstrate saving and loading
         
         #model.save("rho05tc05")
-        model = PPO.load("/home/osmanoscar/DH_mars/"+str(rho)+ str(treward)+"/1/best_model.zip")
+        model = PPO.load("/home/osmanoscar/DH_mars/"+str(rho)+'/'+ str(treward)+"/1/best_model.zip")
         model.save("rho05tc05b")
         #model = PPO.load("rho05tc05") histdata = np.append(histdata[1:],newdata)
         
