@@ -136,7 +136,7 @@ model.learn(total_timesteps=(2520*years), callback = [callback_1, callback_2])
 #del model # remove to demonstrate saving and loading
 
 #model.save("rho05tc05")
-model = PPO.load("/home/osmanoscar/DH_mars/"+ str(treward)+"1/best_model.zip")
+model = PPO.load("/home/osmanoscar/DH_mars/"+ str(treward)+"/1/best_model.zip")
 model.save("rho05tc05b")
 #model = PPO.load("rho05tc05") histdata = np.append(histdata[1:],newdata)
 
