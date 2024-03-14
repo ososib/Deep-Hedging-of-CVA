@@ -95,13 +95,13 @@ check_env(env, warn=True)
 
 
 # Create log dir
-log_dir_0 = "/tmp/gym/0/" # change wehn script to depend on reward function, rho, and tc
+log_dir_0 = "/home/osmanoscar/DH_mars/0/" # change wehn script to depend on reward function, rho, and tc
 os.makedirs(log_dir_0, exist_ok=True) #change exists?
 
-log_dir_1 = "/tmp/gym/1/" # change wehn script to depend on reward function, rho, and tc
+log_dir_1 = "/home/osmanoscar/DH_mars/1/" # change wehn script to depend on reward function, rho, and tc
 os.makedirs(log_dir_1, exist_ok=True) #change exists?
 
-log_dir_2 = "/tmp/gym/2/" # change wehn script to depend on reward function, rho, and tc
+log_dir_2 = "/home/osmanoscar/DH_mars/2/" # change wehn script to depend on reward function, rho, and tc
 os.makedirs(log_dir_2, exist_ok=True) #change exists?
 
 # Wrap the environment
