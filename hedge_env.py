@@ -72,6 +72,53 @@ class HedgingEnv(gym.Env):
         self.dailypnl=np.array([])
 
     def _compute_reward(self, h, p ,nh): #h is currently held hedge, p is current price, op is old price, nh is next hedge. #still need to add variance stuff(?)
+        if self.reward_function == 1:
+          reward = self.reward1(h,p)
+        elif self.reward_function == 2:
+          reward = self.reward2(h,p)
+        elif self.reward_function == 3:
+          reward = self.reward3(h,p)
+        elif self.reward_function == 4:
+          reward = self.reward4(h,p)
+        elif self.reward_function == 5:
+          reward = self.reward5(h,p)
+        elif self.reward_function == 6:
+          reward = self.reward6(h,p)
+        elif self.reward_function == 7:
+          reward = self.reward7(h,p)
+        elif self.reward_function == 8:
+          reward = self.reward8(h,p)
+        elif self.reward_function == 9:
+          reward = self.reward9(h,p)
+        elif self.reward_function == 10:
+          reward = self.reward10(h,p)
+        elif self.reward_function == 11:
+          reward = self.reward11(h,p)
+        elif self.reward_function == 12:
+          reward = self.reward12(h,p)
+        elif self.reward_function == 13:
+          reward = self.reward13(h,p)
+        elif self.reward_function == 14:
+          reward = self.reward14(h,p)
+        elif self.reward_function == 15:
+          reward = self.reward15(h,p)
+        elif self.reward_function == 16:
+          reward = self.reward16(h,p)
+        elif self.reward_function == 17:
+          reward = self.reward17(h,p)
+        elif self.reward_function == 18:
+          reward = self.reward18(h,p)
+        elif self.reward_function == 19:
+          reward = self.reward19(h,p)
+        elif self.reward_function == 20:
+          reward = self.reward20(h,p)
+        elif self.reward_function == 21:
+          reward = self.reward21(h,p)
+        elif self.reward_function == 22:
+          reward = self.reward22(h,p)
+        else:
+          reward = 0
+        """
         match self.reward_function:
           case 1: reward = self.reward1(h,p)
           case 2: reward = self.reward2(h,p)
@@ -96,6 +143,7 @@ class HedgingEnv(gym.Env):
           case 21: reward = self.reward21(h,p)
           case 21: reward = self.reward22(h,p)
           case _: reward = 0
+        """
         #tradingcost = np.abs(np.abs(2*nh[0]-2*h[0])*p[0]+np.abs(2*nh[1]-2*h[1])*p[1])*self.trading_cost_para
         #sellvalue =  p[2]+(h[0]*p[0]+h[1]*p[1])
         #reward = sellvalue-self.buyvalue
@@ -106,7 +154,7 @@ class HedgingEnv(gym.Env):
         #self.price = np.append(self.price,[p[2]])
         #reward = np.min([pminush,0]) - tradingcost  # same as above, but does not punish under-hedging, as that gives profit
         tradingcost = np.abs(np.abs(2*nh[0]-2*h[0])*self.oldprice[0]+np.abs(2*nh[1]-2*h[1])*self.oldprice[1])*self.trading_cost_para #i feel ok with abs for tc.
-        reward = reward - tradingcost
+        reward = reward #- tradingcost
         return reward
 
     def comp_pnl(self,h,p):
@@ -151,7 +199,7 @@ class HedgingEnv(gym.Env):
         return 0
       else:
         self.dailypnl = np.append(self.dailypnl[1:],[self.comp_pnl(h,p)])
-        return calculate_es(self.dailypnl,alpha= 0.01)
+        return calculate_es(self.dailypnl,alpha= 0.99)
 
     def reward8(self, h, p):
       pnl = self.comp_pnl(h,p)
@@ -191,11 +239,11 @@ class HedgingEnv(gym.Env):
       sim_hedge_err = (sim_contract-self.oldprice[2])-((2*h[0]*a+2*h[1]*b)-(2*h[0]*self.oldprice[0]+2*h[1]*self.oldprice[1]))
       return -np.abs(np.mean(sim_hedge_err))-np.std(sim_hedge_err)
 
-    def reward17(self, h, p):
+    def reward15(self, h, p):
       abserror = (p[2]-(2*h[0]*p[0]+2*h[1]*p[1]))
       return -np.abs(abserror)
 
-    def reward18(self, h, p):
+    def reward16(self, h, p):
       abserror = (p[2]-(2*h[0]*p[0]+2*h[1]*p[1]-self.oldprice[2]))
       return -np.abs(abserror)
 
