@@ -51,8 +51,8 @@ from stable_baselines3.common.vec_env import DummyVecEnv, VecEnv, sync_envs_norm
 if TYPE_CHECKING:
     from stable_baselines3.common import base_class
 
-import market_sim
-import esvar
+from market_sim import *
+from esvar import *
 
 class HedgingEnv(gym.Env):
 
