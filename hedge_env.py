@@ -193,13 +193,14 @@ class HedgingEnv(gym.Env):
         #var99_10days=var99 * np.sqrt(10)
         return calculate_var(self.dailypnl, 1)
 
+
     def reward7(self, h, p):
       if self.n < 30:
-        self.dailypnl = np.append(self.dailypnl,[self.comp_pnl(h,p)])
+        self.dailypnl = np.append(self.dailypnl,[-self.comp_pnl(h,p)])
         return 0
       else:
-        self.dailypnl = np.append(self.dailypnl[1:],[self.comp_pnl(h,p)])
-        return calculate_es(self.dailypnl,alpha= 0.99)
+        self.dailypnl = np.append(self.dailypnl[1:],[-self.comp_pnl(h,p)])
+        return -calculate_es(self.dailypnl,alpha= 0.99)
 
     def reward8(self, h, p):
       pnl = self.comp_pnl(h,p)
