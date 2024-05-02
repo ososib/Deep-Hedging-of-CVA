@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 23 11:00:04 2024
-
-@author: osman
-"""
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,13 +9,17 @@ def plot_rewards_over_time(file_path):
     # Ensure columns are correctly named if there are any issues with extra spaces
     data.columns = data.columns.str.strip()
     #data['cumulative_r'] = data['r'].cumsum()
+    # Calculate the moving average of the rewards
+    window_size = 10  # Define the size of the moving average window
+    data['moving_average'] = data['r'].rolling(window=window_size).mean()
     
     # Plotting the rewards over time
     plt.figure(figsize=(10, 6))
-    plt.plot(data['t'], data['r'], label='Reward', color='blue')
+    plt.scatter(data['l'].cumsum(), data['r'], label='Actual Reward', color='blue', alpha=0.6)
+    plt.plot(data['l'].cumsum(), data['moving_average'], label='Moving Average (window={})'.format(window_size), color='red', linewidth=2)
     plt.xlabel('Time')
     plt.ylabel('Reward')
-    plt.title('Rewards Over Time')
+    plt.title('Rewards and Moving Average Over Time')
     plt.legend()
     plt.grid(True)
     plt.show()
