@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 23 10:54:06 2024
 
-@author: osman
-"""
+input_tc = float(input ("Enter trading cost :"))
+input_rho = float(input ("Enter correlation :")) 
+input_reward = float(input ("Enter reward :")) 
+
 
 
 import os
@@ -364,15 +363,16 @@ r = 0.01
 lambda_J = 0.1
 sigma_J = 0.5
 
-rho = 0 #can be between -1 and 1!
+rho = input_rho #can be between -1 and 1!
 
 apm = BOTH(r_0=r_H, dt = dt, sigma_H = sigma_H, alpha = alpha, s_0=s_0, r=r, sigma=sigma, mu_J=mu_J, lambda_J=lambda_J, sigma_J=sigma_J, rho=rho)
 
 ###################################################################
 ###################################################################
 
-trading_cost = 0.05
-treward = 7
+trading_cost = input_tc
+treward = input_reward
+
 env = HedgingEnv(apm, trading_cost_para=trading_cost, reward_function=treward)
 eval_Env = HedgingEnv(apm, trading_cost_para=trading_cost, reward_function=treward)
 eval_Env_Bench = HedgingEnv(apm, trading_cost_para=trading_cost, reward_function=1)
@@ -393,7 +393,7 @@ def replace_backslash_with_forward_slash(input_string):
 # Example usage:
     
 path_dir = input ("Enter path :") 
-path_dir = replace_backslash_with_forward_slash(path_dir)
+path_dir = replace_backslash_with_forward_slash(path_dir+"/best_model.zip")
 
 #model = PPO.load("rho0tc05sqrt")
 #model = SAC.load("ppo_try23")
@@ -440,15 +440,14 @@ rew=[0]
 obs = env.reset()
 obs = obs[0]
 price = [obs[2]]
+
 B=[obs[0]]
 A=[obs[1]]
-HV=[obs[2]]
-PC=[0]
-HC=[0]
 
-#HO=[obs[2]]
-HA=[0]
-HB=[0]
+
+
+HA=[0] #hedge quantinity/weight
+HB=[0] #hedge quantinity/weight
 
 HAA=[]
 HBB=[]
@@ -459,25 +458,17 @@ i=0
 done = False
 while not done:
     action, _states = model.predict(obs, deterministic=True) #model.predict(obs)
-    action = 2*action
+    action = action
     HB.append(action[0]/obs[1])#*obs[0])#+HA[-1])
     HA.append(action[1]/obs[0])#*obs[1])#+HB[-1])
-    HBB.append(action[0])#*obs[0])#+HA[-1])
-    HAA.append(action[1])#*obs[1])#+HB[-1])
+    HBB.append(action[0])#*obs[0])#+HA[-1]) #hedge quantinity/weight
+    HAA.append(action[1])#*obs[1])#+HB[-1]) #hedge quantinity/weight
     obs, rewards, done, trunc, info = env.step(action)
     price.append(obs[2])
-    #act.append(action[0]+action[1]*obs[0]+action[2]*obs[1])
     act.append(action[0]*obs[0]+action[1]*obs[1])
     A.append(obs[1])
     B.append(obs[0])
-    #HO.append(action[0])#/(obs[0]*obs[1]))#+HA[-1])
-    #HA.append(action[1])#/obs[1])#+HA[-1])
-    #HB.append(action[2])#/obs[0])#+HB[-1])
-    #HA.append(action[0]/obs[1])#*obs[0])#+HA[-1])
-    #HB.append(action[1]/obs[0])#*obs[1])#+HB[-1])
-    #HV.append(HO[-1]*1.03+HA[-1]*obs[0]+HB[-1]*obs[1])
-    #PC.append(price[-1]-price[-2])
-    #HC.append(HV[-1]-HV[-2])
+
     #hedgepl.append(obs[2]-(action[0]+action[1]*obs[0]+action[2]*obs[1]))
     hedgepl.append(obs[2]-(action[0]*obs[0]+action[1]*obs[1]))
     i+=1
