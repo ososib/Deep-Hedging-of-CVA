@@ -63,6 +63,7 @@ def calculate_es(returns, alpha):
 
     # Compute the index corresponding to the quantile
     #Var = np.percentile(returns_sorted, percent)
+    #alpha = 0.99 # VaR/ES Level for the loss distribution
 
       mu, std = stats.norm.fit(returns)
       ES = mu+(std*1/np.sqrt(2*np.pi)*np.exp(-0.5*stats.norm.ppf(alpha)**2))/(1-alpha)
@@ -85,7 +86,7 @@ def calculate_var(returns, percent):
 
     # Compute the index corresponding to the quantile
     #Var = np.percentile(returns_sorted, percent)
-
+    #Look for the 99th percentile for the loss distribution
     Var = np.percentile(returns, percent) #should give the same
 
     return Var
