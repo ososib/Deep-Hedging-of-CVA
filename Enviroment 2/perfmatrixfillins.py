@@ -127,14 +127,14 @@ for evals in [2]:
           Q_quantity = obs[21:31]
           Swaps_quantity = obs[31:]
           
-          processes=np.array([obs[0:20]])
+          processes=np.array([obs[0:21]])
           nun=np.array([0]*20)
           done = False
           
           
           while not done:
             obs, rewards, done, trunc, info = env.step(nun)
-            processes = np.append(processes,[obs[0:20]],0) #processes is a matrix with the first row being the initial state and the rest being the states at each time step, the columns are Qs, Swaps, and cva 
+            processes = np.append(processes,[obs[0:21]],0) #processes is a matrix with the first row being the initial state and the rest being the states at each time step, the columns are Qs, Swaps, and cva 
             
         
 
@@ -149,8 +149,7 @@ for evals in [2]:
             """
 
           
-            acts_Q = np.array([[0]*10])
-            acts_S = np.array([[0]*10])
+            acts = np.array([[0]*20])
             action = np.array([[0]*20])
 
             for i in range(len(processes)):
@@ -165,7 +164,7 @@ for evals in [2]:
             P = processes[:, 20]
             
             rows, columns = Qs.shape
-            zero_row=np.zeros(1,columns)
+            zero_row=np.zeros((1,columns))
 
             Model_buy = np.sum(Qs[:-1] * acts[:, 0:10], axis=1) + np.sum(Swaps[:-1] * acts[:, 10:20], axis=1)
             Model_sell = np.sum(Qs[1:] * acts[:, 0:10], axis=1) + np.sum(Swaps[1:] * acts[:, 10:20], axis=1)
@@ -205,7 +204,7 @@ for evals in [2]:
 
           ## Do Delta:
           rows, columns = Qs.shape
-          zero_row=np.zeros(1,columns)
+          zero_row=np.zeros((1,columns))
         
           Qs = processes[:, 0:10] #This operation selects all rows (:) and the first 10 columns (0:10) of the array
           Swaps = processes[:, 10:20]
