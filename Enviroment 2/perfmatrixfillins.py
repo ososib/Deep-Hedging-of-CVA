@@ -92,7 +92,7 @@ for i in range (2520):
   a.append(np.floor(t/(beta_i))*(beta_i))
   
 
-for evals in [2]:
+for evals in [1]:
 
   for trading_cost in [0]:# [0, 0.05, 1]:
 
