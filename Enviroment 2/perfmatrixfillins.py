@@ -92,7 +92,7 @@ for i in range (2520):
   a.append(np.floor(t/(beta_i))*(beta_i))
   
 
-for evals in [1]:
+for evals in [2]:
 
   for trading_cost in [0]:# [0, 0.05, 1]:
 
@@ -127,7 +127,7 @@ for evals in [1]:
           Q_quantity = obs[21:31]
           Swaps_quantity = obs[31:]
           
-          processes=np.array([obs[0:3]])
+          processes=np.array([obs[0:20]])
           nun=np.array([0]*20)
           done = False
           
@@ -142,7 +142,7 @@ for evals in [1]:
           ####################################################################################################################################################
           
           for treward in [7]: #range(1,8):
-            env = HedgingEnv(apm, trading_cost_para=trading_cost, reward_function=treward)
+            env = HedgingEnv(apm, trading_cost_para=trading_cost, reward_function=treward, T=T, dt=dt, a=a, beta_i=beta_i)
             model = PPO.load("/home/osmanoscar/CVA_results_04_29/tmp/"+ 'tc' + str(trading_cost) +'/rho'+str(rho)+'/'+ 'rwf' +str(treward)+"/" + str(evals) + "/best_model.zip")
             
             """## Model comparisons ##
