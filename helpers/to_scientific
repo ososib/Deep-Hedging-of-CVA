@@ -1,0 +1,40 @@
+import os
+import re
+
+# Function to convert a number to LaTeX scientific notation format
+def to_latex_scientific_notation(number):
+    number = str(number)
+    mantissa, exponent = number.split('E')
+    exponent = int(exponent)
+    formatted_string = mantissa + "$\\cdot\\text{10}^{\\text{"+str(exponent)+'}' + "}$"
+    return formatted_string
+
+
+for trading_cost in [0,0.05]:#[0,0.05,1]:
+    folder_path = "/Users/oscar/Desktop/DeepHedging/Tables/real/" + 'tc' + str(trading_cost) + '/'#"/home/osmanoscar/DH_mars/tmp/"+ 'tc' + str(trading_cost) + '/'
+
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".tex"):
+            file_path = os.path.join(folder_path, filename)
+            # Read the LaTeX file
+            with open(file_path, 'r') as file:
+                lines = file.readlines()
+
+            # Iterate through the lines of the LaTeX file
+            modified_lines = []
+            for line in lines:
+                # Search for numbers using regular expression
+                modified_line = re.sub(r'\d+\.\d+E[-+]\d+', lambda x: to_latex_scientific_notation(x.group(0)), line)
+                modified_lines.append(modified_line)
+                # Search for label using regex
+                if re.search(r'\\label{.*}', line):
+                    # Add beginning of resizebox
+                    modified_lines.append("\\resizebox{\\textwidth}{!}{"+'\n')
+                # Search for end of tabular using regex
+                elif re.search(r'\\end{tabular}', line):
+                    # Add end of resizebox
+                    modified_lines.append('}'+'\n')
+
+            # Write the modified lines back to the LaTeX file
+            with open(file_path, 'w') as file:
+                file.writelines(modified_lines)
