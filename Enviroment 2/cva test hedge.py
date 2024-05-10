@@ -90,7 +90,7 @@ class BOTH(GenericAssetPriceModel):
         cee = 1 + self.kappa*self.dt+self.nu*np.sqrt(self.dt)*np.abs(x1)/np.sqrt(self.current_lambda)
         self.current_lambda = self.current_lambda + self.kappa*(self.mu-self.current_lambda)*self.dt/cee + self.nu*np.sqrt(self.current_lambda)*np.sqrt(self.dt)*x1/cee + self.j[self.t]
         self.t = self.t+1
-        self.current_r = self.current_r*np.exp(sigma*np.sqrt(dt)*x3)#self.current_r+self.current_r*sigma*np.sqrt(dt)*x3
+        self.current_r = self.current_r*np.exp(self.sigma*np.sqrt(self.dt)*x3)#self.current_r+self.current_r*sigma*np.sqrt(dt)*x3
 
     def alphabeta(self,h,T,t):
       denom=(2*h+(self.kappa+h)*(np.exp(h*(T-t))-1))
@@ -146,7 +146,7 @@ class BOTH(GenericAssetPriceModel):
       return S
 
 
-    def get_Q(self,u,length):
+    def get_Q(self,u,length,t):
       Q=np.zeros(length-1)
       adj=length-len(u)
       for j in range(1,len(u)):
@@ -158,10 +158,17 @@ class BOTH(GenericAssetPriceModel):
           Q[adj+j-1]=(1 - self.compute_next_price(u[j],t))
       return Q
 
-
     def compute_swaps(self,T,t,u,K,S,length):
       sigma = self.sigma
       r = self.current_r
+
+      #for i in range (2520):
+       # t=t+dt
+       # a.append(np.floor(t/(beta_i))*(beta_i))
+        #a=[x-a[0] for x in a]
+        #length=len(np.unique(a))
+
+      
       swaps=np.zeros(length-1)
       adj=length-len(u)
       for k in range(1,len(u)):
@@ -180,6 +187,7 @@ class BOTH(GenericAssetPriceModel):
     def discount_curve(self, tenor, current_time, short_rate):
         discount_terms= [np.exp(-short_rate*(T-current_time)) for T in tenor]
         return  sum(discount_terms)# flat discount rate of 5%
+
 ###################################################################
 ###################################################################
 def calculate_var(returns, percent):
@@ -239,7 +247,7 @@ class HedgingEnv(gym.Env):
 
         S=self.price_model.get_S(self.T, self.t, u, self.beta_i)
         self.swaps = self.price_model.compute_swaps(self.T,self.t,u,self.K,S,self.length)
-        self.Qs = price_model.get_Q(u,self.length)
+        self.Qs = price_model.get_Q(u,self.length,self.t)
 
         self.n = 0
         self.done = False
@@ -253,6 +261,7 @@ class HedgingEnv(gym.Env):
         self.oldSwaps=self.swaps
         self.oldCva=np.dot(self.Qs,self.swaps)
         self.dailypnl=np.array([])
+        
 
     def _compute_reward(self, h, Qs, swaps, cva ,nh): #h is currently held hedge, p is current price, op is old price, nh is next hedge. #still need to add variance stuff(?)
         if self.reward_function == 1:
@@ -263,6 +272,12 @@ class HedgingEnv(gym.Env):
           reward = self.reward3(h, Qs, swaps, cva)
         elif self.reward_function == 4:
           reward = self.reward4(h, Qs, swaps, cva)
+        elif self.reward_function == 5:
+          reward = self.reward5(h, Qs, swaps, cva)
+        elif self.reward_function == 6:
+          reward = self.reward6(h, Qs, swaps, cva)
+        elif self.reward_function == 7:
+          reward = self.reward7(h, Qs, swaps, cva)
         else:
           reward = 0
         tradingcost = np.dot(np.abs(nh-h),np.concatenate((self.oldQs,self.oldSwaps)))*self.trading_cost_para
@@ -280,7 +295,7 @@ class HedgingEnv(gym.Env):
         elif self.reward_function == 9:
           reward = self.reward9(h, Qs, swaps, cva)
         elif self.reward_function == 10:
-          reward = self.reward10(h, Qs, swaps, cva)
+          rwward = self.reward10(h, Qs, swaps, cva)
         """
 
     def comp_pnl(self,h, Qs, swaps, cva):
@@ -303,7 +318,7 @@ class HedgingEnv(gym.Env):
     def reward4(self, h, Qs, swaps, cva):
       pnl = self.comp_pnl(h, Qs, swaps, cva)
       return -(pnl)**2
-    """"
+    
     def reward5(self, h, Qs, swaps, cva):
       a,b = self.price_model.sim_many_prices(0.03, self.oldprice[0], self.oldprice[1])
       sim_contract = a*b
@@ -312,21 +327,22 @@ class HedgingEnv(gym.Env):
 
     def reward6(self, h, Qs, swaps, cva):
       if self.n < 30:
-        self.dailypnl = np.append(self.dailypnl,[self.comp_pnl(h, Qs, swaps, cva)])
+        self.dailypnl = np.append(self.dailypnl,[-self.comp_pnl(h, Qs, swaps, cva)])
         return 0
       else:
-        self.dailypnl = np.append(self.dailypnl[1:],[self.comp_pnl(h, Qs, swaps, cva)])
+        self.dailypnl = np.append(self.dailypnl[1:],[-self.comp_pnl(h, Qs, swaps, cva)])
         #var99_10days=var99 * np.sqrt(10)
-        return calculate_var(self.dailypnl, 1)
+        return -calculate_var(self.dailypnl, 99)
 
     def reward7(self, h, Qs, swaps, cva):
       if self.n < 30:
-        self.dailypnl = np.append(self.dailypnl,[self.comp_pnl(h, Qs, swaps, cva)])
+        self.dailypnl = np.append(self.dailypnl,[-self.comp_pnl(h, Qs, swaps, cva)])
         return 0
       else:
-        self.dailypnl = np.append(self.dailypnl[1:],[self.comp_pnl(h, Qs, swaps, cva)])
-        return calculate_es(self.dailypnl,alpha= 0.99)
+        self.dailypnl = np.append(self.dailypnl[1:],[-self.comp_pnl(h, Qs, swaps, cva)])
+        return -calculate_es(self.dailypnl,alpha= 0.99)
 
+    """
     def reward8(self, h, Qs, swaps, cva):
       pnl = self.comp_pnl(h, Qs, swaps, cva)
       return -np.sqrt(np.abs(pnl))
@@ -344,14 +360,15 @@ class HedgingEnv(gym.Env):
         self.oldQs=self.Qs
         self.oldSwaps=self.swaps
         self.oldCva=np.dot(self.Qs,self.swaps)
-
+        
+        a=self.a
         u = np.unique(a[self.n:])
 
         self.price_model.compute_next_intensity_and_rate()
 
         S=self.price_model.get_S(self.T, self.t, u, self.beta_i)
         self.swaps = self.price_model.compute_swaps(self.T,self.t,u,self.K,S,self.length)
-        self.Qs = self.price_model.get_Q(u,self.length)
+        self.Qs = self.price_model.get_Q(u,self.length,self.t)
         cva=np.dot(self.Qs,self.swaps)
 
         reward = self._compute_reward(self.h, self.Qs, self.swaps, cva, new_h)
@@ -372,12 +389,12 @@ class HedgingEnv(gym.Env):
         self.price_model.reset()
 
         self.t=0
-
+        a=self.a
         u = np.unique(a)
         self.K=self.price_model.get_K(self.T, self.t, u, self.beta_i)
         S=self.price_model.get_S(self.T, self.t, u, self.beta_i)
         self.swaps = self.price_model.compute_swaps(self.T,self.t,u,self.K,S,self.length)
-        self.Qs = self.price_model.get_Q(u,self.length)
+        self.Qs = self.price_model.get_Q(u,self.length,self.t)
 
         self.n = 0
         self.done = False
@@ -389,36 +406,52 @@ class HedgingEnv(gym.Env):
         self.oldCva=np.dot(self.Qs,self.swaps)
         self.dailypnl=np.array([])
         state = np.concatenate((self.Qs, self.swaps, np.array([np.dot(self.Qs,self.swaps)]),self.h))
-        return state, {}   
-    
+        return state, {}
+
 ###################################################################
 ###################################################################
 
-dt = 1/252
-sigma_H = 0.03
-r_H = 0.3
 
-alpha = 0.1
+dt = 1/252 # time step
+lambda0=0.035
+kappa=0.35
+mu=0.045
+nu=0.15
+jump_alpha=0.001 #his values here are crazy borgir
+jump_gamma=0.0005
 
-mu_J = 0.2
-s_0 = 0.4
-sigma = 0.05
-r = 0.01
-lambda_J = 0.1
-sigma_J = 0.5
+T=10
 
-rho = 0 #can be between -1 and 1!
+t=0
 
-apm = BOTH(r_0=r_H, dt = dt, sigma_H = sigma_H, alpha = alpha, s_0=s_0, r=r, sigma=sigma, mu_J=mu_J, lambda_J=lambda_J, sigma_J=sigma_J, rho=rho)
+beta_i=T/(10)
 
+rho = 0
+
+r0=0.03
+sigma=0.1
+
+a=[]
+for i in range (2520):
+  t=t+dt
+  a.append(np.floor(t/(beta_i))*(beta_i))
+#a=[x-a[0] for x in a]
+length=len(np.unique(a))
+#print(length)
+t=0
+
+
+apm = BOTH(dt = dt, rho=rho, lambda0=lambda0, kappa=kappa, mu=mu, nu=nu, jump_alpha=jump_alpha, jump_gamma=jump_gamma, r0=r0, sigma=sigma)
 ###################################################################
 ###################################################################
 
 trading_cost = 0
 treward = 7
-env = HedgingEnv(apm, trading_cost_para=trading_cost, reward_function=treward)
-eval_Env = HedgingEnv(apm, trading_cost_para=trading_cost, reward_function=treward)
-eval_Env_Bench = HedgingEnv(apm, trading_cost_para=trading_cost, reward_function=1)
+
+
+env = HedgingEnv(apm, trading_cost_para=trading_cost, reward_function=treward, T=T, dt=dt, a=a, beta_i=beta_i)
+eval_Env = HedgingEnv(apm, trading_cost_para=trading_cost, reward_function=treward, T=T, dt=dt, a=a, beta_i=beta_i)
+eval_Env_Bench = HedgingEnv(apm, trading_cost_para=trading_cost, reward_function=1, T=T, dt=dt, a=a, beta_i=beta_i)
 
 
 # If the environment don't follow the interface, an error will be thrown
