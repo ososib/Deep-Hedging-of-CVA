@@ -1,1 +1,1 @@
-# Deep-Hedging-with-cross-gamma
+# Deep-Hedging-of-CVA
